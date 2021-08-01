@@ -33,56 +33,14 @@ deg2rad <- function(deg) { return (deg * (pi / 180)) }
 #'
 rad2deg <- function(rad) { return ((180 / pi) * rad) }
 
-
-#' Convert colors in various formats to Lab
-#'
-#' @param col Color
-#' @param type Type of color (eg "hex", "RGB", "rgb")
-#'
-#' @examples col2lab("#abcdef", "hex")
-#' @examples col2lab(c(171, 205, 239), "RGB")
-#' @examples col2lab(c(0.6705882, 0.8039216, 0.9372549), "rgb")
-#'
-#' @examples lab <- col2lab("#c02f1d")
-#'   l <- lab
-#'
-col2lab <- function(col, type = "hex") {
-  if (type == "lab") {
-    return (Lab(
-      L = col[1],
-      a = col[2],
-      b = col[3]
-    ))
-  }
-  else if (type == "hex") {
-    rgb = hex2RGB(col)
-  } else if (type == "RGB") {
-    col = col / 255
-    rgb = rgb(col[1], col[2], col[3])
-  } else if (type == "rgb") {
-    rgb = rgb(col[1], col[2], col[3])
-  } else {
-    #print(paste0("Type ", type, " not found"))
-  }
-  lab <- rgb2XYZ(rgb)
-  lab <- XYZ2CieLab()
-  print(lab)
-  lab <- Lab(
-    L = as(rgb, "LAB")@coords[,1:3][[1]],
-    a = as(rgb, "LAB")@coords[,1:3][[2]],
-    b = as(rgb, "LAB")@coords[,1:3][[3]]
-  )
-  return(lab)
-}
-
 #' Get deltaE of two colors
 #'
 #' The calculation is performed in the CieLab color space.
-#' @param col1 First color [hex]
-#' @param col2 Second color [hex]
+#' @param col1 First color
+#' @param col2 Second color
 #' @param k Correctur ("default", "screen", "textil")
 #'
-#' @See https://github.com/gfiumara/CIEDE2000
+#' See https://github.com/gfiumara/CIEDE2000
 deltaE2000 <- function(col1, col2, k = "default") {
   lab1 = col1$to("CieLab")
   lab2 = col2$to("CieLab")
@@ -225,10 +183,6 @@ deltaE2000 <- function(col1, col2, k = "default") {
 #' @examples apca(RGB(255,255,255), RGB(234,116,57))
 #'
 apca <- function(bg, fg = RGB(255,255,255)) {
-  if(is.vector(bg))
-    bg = RGB(bg)
-  if(is.vector(fg))
-    fg = RGB(fg)
   bg = bg$to("RGB")
   fg = fg$to("RGB")
 
@@ -292,26 +246,28 @@ apca <- function(bg, fg = RGB(255,255,255)) {
 #' Calculate the relative luminance of color
 #'
 #' The calculation is performed in the rgb  color space
-#' @param hex Color in hex rgb
+#' @param col Color
 #' @examples luminance("#aabbcc")
 #'
-luminance <- function(hex) {
-  rgb <- col2rgb(hex)
-  for (i in 1:length(rgb)) {
-    rgb[i] <- rgb[i] / 255
-    if (rgb[i] < 0.03928) {
-      rgb[i] <- rgb[i] / 12.92
+luminance <- function(color) {
+  channel <- function(c) {
+    if (c < 0.03928) {
+      return(c / 12.92)
     } else {
-      rgb[i] <- (rgb[i] + 0.055) / (1.055^2.4)
+      return( (c + 0.055) / (1.055^2.4) )
     }
   }
-  return(rgb[1] * 0.2126 + rgb[2] * 0.7152 + rgb[3] * 0.0722)
+  rgb <- color$to("rgb")
+  r <- channel(rgb$r)
+  g <- channel(rgb$g)
+  b <- channel(rgb$b)
+  return(r * 0.2126 + g * 0.7152 +b * 0.0722)
 }
 
 #' Calculate contrast ratio of two colors
 #'
-#' @param colorA First color in hex rgb
-#' @param colorB Second color in hex rgb
+#' @param colorA First color
+#' @param colorB Second color
 #' @examples contrast_ratio("#aabbcc", "#ddeeff")
 #'
 contrast_ratio <- function(colorA, colorB) {

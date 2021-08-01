@@ -31,8 +31,7 @@ rgb <- setRefClass("rgb",
                        if( 0 > r | r > 1 |
                            0 > g | g > 1 |
                            0 > b | b > 1) {
-                         warning("rgb out of bounds")
-                         return(NULL)
+                         stop("rgb out of bounds")
                        } else {
                          r <<- r
                          g <<- g
@@ -60,8 +59,7 @@ RGB <- setRefClass("RGB",
                        if( 0 > R | R > 255 |
                            0 > G | G > 255 |
                            0 > B | B > 255) {
-                         warning("RGB out of bounds")
-                         return(NULL)
+                         stop("RGB out of bounds")
                        } else {
                          R <<- R
                          G <<- G
@@ -88,10 +86,36 @@ hex <- setRefClass("hex",
                          if (nchar(hex) == 7)
                            hex <<- sub(".", "", hex)
                          else
-                           hex <<- value
+                           hex <<- hex
                        }
                        else
-                         warning("Not a valid hex code")
+                         stop("Not a valid hex code")
+                     }
+                   ),
+                   contains = "base.color")
+
+
+#' CMYK Class
+#'
+#' @param C Cyan
+#' @param M Magenta
+#' @param Y Yellow
+#' @param K K?
+#'
+#' @export
+CMYK <- setRefClass("CMYK",
+                   fields = list(
+                     C = "numeric",
+                     M = "numeric",
+                     Y = "numeric",
+                     K = "numeric"
+                   ),
+                   methods = c(
+                     initialize = function(C,M,Y,K) {
+                      C <<- C
+                      M <<- M
+                      Y <<- Y
+                      K <<- K
                      }
                    ),
                    contains = "base.color")
@@ -114,6 +138,13 @@ XYZ <- setRefClass("XYZ",
                      Y = "numeric",
                      Z = "numeric"
                    ),
+                   methods = c(
+                     initialize = function(X,Y,Z) {
+                       X <<- X
+                       Y <<- Y
+                       Z <<- Z
+                     }
+                   ),
                    contains = "base.color")
 
 #' Yxy Class
@@ -124,6 +155,13 @@ Yxy <- setRefClass("Yxy",
                      Y = "numeric",
                      x = "numeric",
                      y = "numeric"
+                   ),
+                   methods = c(
+                     initialize = function(Y,x,y) {
+                       Y <<- Y
+                       x <<- x
+                       y <<- y
+                     }
                    ),
                    contains = "base.color")
 
@@ -143,6 +181,13 @@ CieLuv <- setRefClass("CieLuv",
                         u = "numeric",
                         v = "numeric"
                       ),
+                      methods = c(
+                        initialize = function(L,u,v) {
+                          L <<- L
+                          u <<- u
+                          v <<- v
+                        }
+                      ),
                       contains = "base.color")
 
 #' Reference class for Cielab color
@@ -158,6 +203,13 @@ CieLab <- setRefClass("CieLab",
                         a = "numeric",
                         b = "numeric"
                       ),
+                      methods = c(
+                        initialize = function(L,a,b) {
+                          L <<- L
+                          a <<- a
+                          b <<- b
+                        }
+                      ),
                       contains = "base.color")
 
 #' Reference class for CieLCh color
@@ -171,6 +223,13 @@ CieLCh <- setRefClass("CieLCh",
                         L = "numeric",
                         C = "numeric",
                         h = "numeric"
+                      ),
+                      methods = c(
+                        initialize = function(L,C,h) {
+                          L <<- L
+                          C <<- C
+                          h <<- h
+                        }
                       ),
                       contains = "base.color")
 
@@ -187,6 +246,13 @@ HSL <- setRefClass("HSL",
                      S = "numeric",
                      L = "numeric"
                    ),
+                   methods = c(
+                     initialize = function(H,S,L) {
+                       H <<- H
+                       S <<- S
+                       L <<- L
+                     }
+                   ),
                    contains = "base.color")
 
 #' Reference class for HSV color
@@ -201,5 +267,12 @@ HSV <- setRefClass("HSV",
                      H = "numeric",
                      S = "numeric",
                      V = "numeric"
+                   ),
+                   methods = c(
+                     initialize = function(H,S,V) {
+                       H <<- H
+                       S <<- S
+                       V <<- V
+                     }
                    ),
                    contains = "base.color")

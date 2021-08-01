@@ -1,8 +1,9 @@
 # See: https://www.easyrgb.com/en/math.php
 
-#library(color.math)
 #' Convert RGB to rgb
 RGB2rgb <- function(RGB) {
+  if (class(RGB) != "RGB")
+    stop("Not a valid RGB code")
   return(rgb(
     r = RGB$R / 255,
     g = RGB$G / 255,
@@ -11,41 +12,23 @@ RGB2rgb <- function(RGB) {
 
 #' Convert rgb to RGB
 rgb2RGB <- function(rgb) {
+  if (class(rgb) != "rgb")
+    stop("Not a valid rgb code")
   return(RGB(
     R = rgb$r * 255,
     G = rgb$g * 255,
     B = rgb$b * 255))
 }
 
-dec2hex <- function(dec, n = 2) {
-  if (dec == 0)
-    hex <- c(0)
-  else
-    hex <- dec2hex.impl(dec)
-  result <- paste(hex, collapse = "")
-  if (length(hex) %% n == 0) {
-    return (result)
-  } else {
-    pre <- paste(rep(0, (n - length(hex) %% n)), collapse = "")
-    return(paste0(pre, result))
-  }
-
-}
-dec2hex.impl <- function (dec, rem = c()) {
-  hex <- c(0:9, "a", "b", "c", "d", "e", "f")
-  if (dec > 0)
-    return ( dec2hex.impl(dec%/%16, c(rem, hex[dec%%16 + 1])) )
-  else {
-    return (rev(c(rem)))
-  }
-}
 
 #' Convert RGB2hex
 RGB2hex <- function(RGB) {
+  if (class(RGB) != "RGB")
+    stop("Not a valid RGB code")
   R <- dec2hex(RGB$R)
   G <- dec2hex(RGB$G)
   B <- dec2hex(RGB$B)
-  return( paste0(c("#", R, G, B), collapse = ""))
+  return( hex(paste0(c("#", R, G, B), collapse = "")))
 }
 
 #' Convert hex to rgb
@@ -59,10 +42,8 @@ RGB2hex <- function(RGB) {
 #'
 hex2RGB <- function(hex) {
   if (is.character(hex)) { hex <- hex(hex) }
-  if (class(hex) != "hex") {
-    warning("Not a valid hex code")
-    return(NULL)
-  }
+  if (class(hex) != "hex")
+    stop("Not a valid hex code")
   col <- strsplit(hex$hex, "")[[1]]
   col <- paste0(col[c(TRUE, FALSE)], col[c(FALSE, TRUE)])
   col <- strtoi(col, base = 16)
@@ -80,6 +61,8 @@ hex2RGB <- function(hex) {
 #' xyz <- rgb2XYZ(orchid)
 #' @export
 rgb2XYZ <- function(rgb) {
+  if (class(rgb) != "rgb")
+    stop("Not a valid rgb code")
   if (rgb$r > 0.04045)
     r = ( (rgb$r + 0.055) / 1.055 )^2.4
   else
@@ -109,6 +92,8 @@ rgb2XYZ <- function(rgb) {
 #' rgb <- XYZ2rgb(orchid)
 #' @export
 XYZ2rgb <- function(XYZ) {
+  if (class(XYZ) != "XYZ")
+    stop("Not a valid XYZ code")
   X = XYZ$X / 100
   Y = XYZ$Y / 100
   Z = XYZ$Z / 100
@@ -133,6 +118,8 @@ XYZ2rgb <- function(XYZ) {
 
 #' Convert XYZ to CieLab
 XYZ2CieLab <- function(XYZ, ref = std_illuminant) {
+  if (class(XYZ) != "XYZ")
+    stop("Not a valid XYZ code")
   X = XYZ$X / ref[["X"]]
   Y = XYZ$Y / ref[["Y"]]
   Z = XYZ$Z / ref[["Z"]]
@@ -158,6 +145,8 @@ XYZ2CieLab <- function(XYZ, ref = std_illuminant) {
 
 #' Convert CieLab to XYZ
 CieLab2XYZ <- function(CieLab, ref = std_illuminant) {
+  if (class(CieLab) != "CieLab")
+    stop("Not a valid CieLab code")
   Y = (CieLab$L + 16) / 116
   X = CieLab$a / 500 + Y
   Z = Y - CieLab$b / 200
@@ -181,6 +170,8 @@ CieLab2XYZ <- function(CieLab, ref = std_illuminant) {
 
 #' Convert XYZ to CieLuv
 XYZ2CieLuv <- function(XYZ, ref = std_illuminant) {
+  if (class(XYZ) != "XYZ")
+    stop("Not a valid XYZ code")
   U = (4 * XYZ$X) / (XYZ$X + (15 * XYZ$Y) + (3 * XYZ$Z))
   V = (9 * XYZ$Y) / (XYZ$X + (15 * XYZ$Y) + (3 * XYZ$Z))
   Y = XYZ$Y / 100
@@ -200,6 +191,8 @@ XYZ2CieLuv <- function(XYZ, ref = std_illuminant) {
 
 #' Convert CieLuv to XYZ
 CieLuv2XYZ <- function(CieLuv, ref = std_illuminant) {
+  if (class(CieLuv) != "CieLuv")
+    stop("Not a valid CieLuv code")
   Y = (CieLuv$L + 16) / 116
   if (Y^3 > 0.008856)
     Y = Y^3
@@ -218,6 +211,8 @@ CieLuv2XYZ <- function(CieLuv, ref = std_illuminant) {
 
 #' Convert XYZ to Yxy
 XYZ2Yxy <- function(XYZ) {
+  if (class(XYZ) != "XYZ")
+    stop("Not a valid XYZ code")
   return(Yxy(
     Y = XYZ$Y,
     x = XYZ$X / (XYZ$X + XYZ$Y + XYZ$Z),
@@ -236,6 +231,8 @@ Yxy2XYZ <- function(Yxy) {
 
 #' Convert rgb to HSL
 rgb2HSL <- function(rgb) {
+  if (class(rgb) != "rgb")
+    stop("Not a valid rgb code")
   min = min(rgb$r, rgb$g, rgb$b) # min value of rgb
   max = max(rgb$r, rgb$g, rgb$b) # max value of rgb
   dMax = max - min               # delta rgb value
@@ -283,9 +280,9 @@ HSL2rgb <- function(HSL) {
       v2 = (HSL$L + HSL$S) - (HSL$S *  HSL$L)
     v1 = 2 * HSL$L - v2
 
-    r = hue2rgb(v1,v2,(H+(1/3)))
-    g = hue2rgb(v1,v2,H)
-    b = hue2rgb(v1,v2,(H-(1/3)))
+    r = .hue2rgb(v1,v2,(H+(1/3)))
+    g = .hue2rgb(v1,v2,H)
+    b = .hue2rgb(v1,v2,(H-(1/3)))
   }
   result <- rgb(
     r = r,
@@ -296,7 +293,7 @@ HSL2rgb <- function(HSL) {
 }
 
 #' Helper function for converting hue to rgb (HSL2rgb)
-hue2rgb <- function(v1, v2, vH) {
+.hue2rgb <- function(v1, v2, vH) {
   if (vH < 0) vH = vH + 1
   if (vH > 1) vH = vH - 1
   if ( (6 * vH) < 1)
@@ -308,198 +305,17 @@ hue2rgb <- function(v1, v2, vH) {
   return(v1)
 }
 
-illuminant.table <- readr::read_csv("data/observer_illuminant.csv",
-                              col_types = readr::cols(
-                                Illuminant = readr::col_character(),
-                                note = readr::col_character(),
-                                .default = readr::col_number()
-                              )) |>
-  dplyr::mutate(
-    Illuminant = as.factor(stringr::str_trim(Illuminant))
-  ) |>
-  dplyr::select(!note) |>
-  tidyr::pivot_longer(!Illuminant,
-                      names_to = c(".value", "angle"),
-                      names_pattern = "([XYZ])([0-9]+)"
-  ) |>
-  dplyr::mutate(
-    angle = as.factor(angle)
-  )
-
-#' Convenience function to get observer illuminant by name and angle
-#'
-#' @param i illuminant
-#' @param a angle
-#' @example get_illuminant("D55", 10)
-get_illuminant <- function(i, a = 10) {
-  result <- illuminant.table |>
-    dplyr::filter(
-      Illuminant == i, angle == a
-    )
-  return(c(
-    X = result$X,
-    Y = result$Y,
-    Z = result$Z))
-}
-std_illuminant <- get_illuminant("D55", 10)
-
-#attach(color.math)
 # Get names of all functions which convert colorspaces
-
 objs <- as.vector(lsf.str(pattern = "^[a-zA-Z]+2[a-zA-Z]+$")) |>
   unlist() |>
   stringr::str_split("2",2)
 
-library(rlang)
-
-#' Node environment
+#' Get list of conversion functions
 #'
-#' @param color Color of the node
-#' @param from Previous color
-#' @param to List of colors we can get to from here
-#' @export
-node <- function(color = NULL, from = NULL, to = NULL) {
-  result <- new.env()
-  result$color <- color
-  result$to <- to
-  result$from <- from
-  return(result)
+#' Helper function for debugging purposes
+print.conversions <- function() {
+  result <- as.vector(lsf.str(pattern = "^[a-zA-Z]+2[a-zA-Z]+$")) |>
+    unlist()
+  print(result)
 }
-
-# Get all paths from given color space as list of characters
-step <- function(from) {
-  result <- objs |>
-    purrr::keep(function(x) x[1] == from ) |>  # keep paths which start from (first index)
-    sapply("[[", 2) # subset to part (second index)
-  return(result)
-}
-
-get.path <- function(node, path = NULL) {
-  if (!is.null(node$from)) {
-    return( get.path(node$from, c(path, node$color)) )
-  } else {
-    return (c(path, node$color))
-  }
-}
-
-
-#' Implements recursive path function
-#'
-#' @param to To as environment
-#' @param queue Vector of environments as FIFO-queue for breadth-first search
-#' @returns Conversion path as vector of characters (eg. c("RGB", "rgb", "XYZ", "CieLuv") )
-path.impl <- function(to, queue) {
-  # init vars
-  queue.new <- c()
-  last.loop <- FALSE
-  results <- c()
-  # loop the queue
-  while(length(queue) & !last.loop) {
-    head <- queue[[1]] # just convenience
-    head.paths <- get.path(head) # get all paths found from head
-    # von head alle möglichen wege als pfadliste p
-    p <- step(head$color)
-    # checke pfadliste und eliminiere unnötige
-    # recursive pfade?
-    for (i in 1:length(p)) {
-      if (p[i] %in% head.paths)
-        p <- p[-i]
-    }
-
-    # die überbleibenden: checke auf treffer
-    if (to %in% p) {
-      results <- c(results, c(rev(get.path(head)), to))
-      last.loop <- TRUE
-    }
-    # transform pfadliste in liste von environments
-    if (length(p) > 0) {
-      p.env <- lapply(p, function(x) node(color = x, from = head)) # pfadliste als environments
-      # append queue
-      queue.new <- c(queue.new, p.env)
-      # path in to
-      queue[[1]]$to <- p.env
-    }
-
-    # reduziere queue
-    queue <- queue[-1]
-
-  }
-  if (last.loop) {
-    # we got at least one match
-    return(results)
-  } else if (!length(queue.new)) {
-    # we didn't got a match
-    return(NULL)
-  } else {
-    # next step
-    if(length(queue.new))
-      return (path.impl(to, queue.new))
-  }
-}
-
-#' Find all possile paths between from and to
-#'
-#' @param from From colorspace as color class
-#' @param to Colorspace as character
-#' @returns Character list of path from-to
-#' @example color.convert("hex", "CieLuv")
-#' @export
-color.convert <- function(from, to) {
-  # if from is to return
-  if(class(from) == to) return (from)
-  head = new.env()
-  head$color <- class(from)
-
-  p <- path.impl(to, c(head))
-  print(p)
-  code <- ""
-  r <- NULL
-
-  for(i in 2:length(p)-1) {
-    #print(paste0(p[i], "2", p[i+1]))
-    #code.string <- rlang::parse_expr(paste0(p[i], "2", p[i+1], "(from)"))
-    #print(is.call(code.string))
-    #rlang::expr_print(code.string)
-    #print(lobstr::ast(!!code.string))
-    if (i < 2) {
-      code.string <- rlang::parse_expr(paste0(p[i], "2", p[i+1]))
-      print(code.string)
-      print(is.call(code.string))
-      r <- rlang::exec(code.string, from)
-      print(r)
-    } else {
-      code.string <- rlang::parse_expr(paste0(p[i], "2", p[i+1]))
-      print(code.string)
-      print(is.call(code.string))
-      r <- rlang::exec(code.string, r)
-      print(r)
-    }
-  }
-  return (r)
-
-  #c <- rlang::parse_expr(code)
-  #print(c)
-  #print(is.call(c))
-}
-
-hex1 <- hex("#aabbcc")
-c <- color.convert(hex1, "RGB")
-print(c)
-c2 <- color.convert(c, "hex")
-print(c2)
-
-color.convert.gray <- function(from, to = class(from)) {
-  if (class(from) == "hex")       { return( color.convert.gray(hex2RGB(from), to) ) }
-  else if (class(from) == "RGB")  { return( color.convert.gray(RGB2rgb(from), to) ) }
-
-  if (class(from) == "rgb") {
-    from$r <- from$r * 0.2989  # red
-    from$g <- from$g * 0.5870  # green
-    from$b <- from$b * 0.1140  # blue
-    print(to)
-   # return(from$to(to))
-  }
-}
-
-#tmp <- hex("#aabbcc")
-# tmp$to("gray")
+print.conversions()

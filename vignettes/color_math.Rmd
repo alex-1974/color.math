@@ -1,5 +1,5 @@
 ---
-title: "color_math"
+title: "color.math"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{color_math}
@@ -16,6 +16,45 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(color.math)
+```
+
+## Color spaces ##
+
+All color spaces inherit from base.color.
+
+### RGB ###
+
+```{r}
+hex("#aabbcc")
+hex("aabbcc")
+RGB(255,0,128)
+rgb(0,1,0.5)
+```
+### CIE ###
+
+```{r}
+XYZ(0,1,0)
+CieLuv(0,0,0)
+CieLab(0,0,0)
+CieLCh(0,0,0)
+```
+
+### CMYK ###
+
+```{r}
+CMYK(0,0,0,0)
+```
+## Color conversion ##
+
+```{r}
+hex <- hex("#aabbcc")
+hex$to("CieLab")
+```
+### Convert to gray ###
+
+```{r}
+hex <- hex("#bbccdd")
+hex$to("gray")
 ```
 
 
@@ -42,9 +81,9 @@ Above a value of 5 we have a significant color difference.
 
 The 1976 formula related a measured color difference to a known set of CIELAB coordinates. It turned out to be not as perceptually uniform as intended. Especially in the saturated regions it rates these colors too highly as opposed to other colors. 
 ```{r}
-col1 <- hex("#aabbcc")
-col2 <- hex("#ddeeff")
-#deltaE76(col1,col2)
+c1 <- hex("#aabbcc")
+c2 <- hex("#ddeeff")
+deltaE76(c1,c2)
 ```
 
 
@@ -52,9 +91,9 @@ col2 <- hex("#ddeeff")
 
 Since 1994 ΔE is defined in the LCh color space with differences in lightness, chroma and hue calculated from Lab coordinates. In 2000 the CIE refined their definition, adding five corrections.
 ```{r}
-col1 <- hex("#aabbcc")
-col2 <- hex("#ddeeff")
-#deltaE2000(col1,col2)
+c1 <- hex("#aabbcc")
+c2 <- hex("#ddeeff")
+deltaE2000(c1,c2)
 ```
 
 ## Contrast ratio ##
@@ -72,7 +111,7 @@ Large text  | 4.5 : 1 | 3 : 1
 Normal text | 7 : 1   | 4.5 : 1
 
 ```{r}
-contrast_ratio("#aabbcc", "#ddeeff")
+contrast_ratio(hex("#aabbcc"), hex("#ddeeff"))
 ```
 
 ### WCAG 3 ###
@@ -90,6 +129,6 @@ Level | Guidelines
 15 | The absolute minimum for any non-text
 
 ```{r}
-#apca(RGB(255,255,255), RGB(234,116,57))
+apca(RGB(255,255,255), RGB(234,116,57))
 ```
 
