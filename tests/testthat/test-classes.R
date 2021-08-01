@@ -1,0 +1,15 @@
+test_that("silent class init basics", {
+  expect_silent(hex("#aabbcc"))
+  expect_silent(hex("aabbcc"))
+  expect_silent(rgb(0,1,0.5))
+  expect_silent(RGB(0,255,0))
+  expect_silent(XYZ(0.2022, 0.1043, 0.009478))
+  expect_silent(Yxy(0.2022, 0.1043, 0.009478))
+  expect_silent(CieLuv(50,-100,100))
+  expect_silent(CieLab(50,-100,100))
+  expect_silent(CieLCh(50,-100,100))
+  expect_silent(HSL(0.2022, 0.1043, 0.009478))
+  expect_silent(HSV(0.2022, 0.1043, 0.009478))
+  expect_silent(CMYK(0,0,0,0))
+
+})
