@@ -1,0 +1,95 @@
+---
+title: "color_math"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{color_math}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(color.math)
+```
+
+
+## Color difference
+
+$\Delta$E is the difference or distance between two colors measured as Euclidean distance within a color space.
+
+### CIELAB $\Delta$E
+
+The _International Commission on Illumination_ (CIE) defined color difference in CIELAB colorspace. Perceptual non-uniformities in the underlying CIELAB colorspace have led to the CIE refining their definition over the years.
+On a typical scale, the $\Delta$E value will range from 0 to 100. 
+
+$\Delta$E | Perception
+----------|-----------
+<1        | Not perceptible by human eyes
+1-2       | Perceptible through close observation
+2 - 10 	  | Perceptible at a glance.
+11 - 49 	| Colors are more similar than opposite
+100 	    | Colors are exact opposite
+
+Above a value of 5 we have a significant color difference.
+
+#### CIE76
+
+The 1976 formula related a measured color difference to a known set of CIELAB coordinates. It turned out to be not as perceptually uniform as intended. Especially in the saturated regions it rates these colors too highly as opposed to other colors. 
+```{r}
+col1 <- hex("#aabbcc")
+col2 <- hex("#ddeeff")
+#deltaE76(col1,col2)
+```
+
+
+#### CIEDE2000
+
+Since 1994 ΔE is defined in the LCh color space with differences in lightness, chroma and hue calculated from Lab coordinates. In 2000 the CIE refined their definition, adding five corrections.
+```{r}
+col1 <- hex("#aabbcc")
+col2 <- hex("#ddeeff")
+#deltaE2000(col1,col2)
+```
+
+## Contrast ratio ##
+
+The contrast ratio is defined as the ratio of the luminance between two colors.
+The W3C defines guidelines (Web Content Accessibility Guidelines) for contrast ratios to be readable by people with a variety of visual or cognitive difficulties.
+
+### WCAG 2 ###
+
+In WCAG 2, contrast is a measure of the difference in perceived "luminance" or brightness between two colors. This brightness difference is expressed as a ratio ranging from 1:1 (e.g. white on white) to 21:1 (e.g., black on a white).
+
+Level       | AAA     | AA
+------------|---------|--------
+Large text  | 4.5 : 1 | 3 : 1
+Normal text | 7 : 1   | 4.5 : 1
+
+```{r}
+contrast_ratio("#aabbcc", "#ddeeff")
+```
+
+### WCAG 3 ###
+
+The W3C Accessibility Guidelines 3.0 are still a working draft as of July 2021.
+See: https://www.myndex.com/APCA/simple
+
+Level | Guidelines
+------|------------
+90 | Suggested for extremely thin fonts
+75 | Preferred level for columns of body text
+60 | The minimum level recommended for readable content text
+45 | The minimum level for larger text such as headlines, and large text that should be readably fluently
+30 | The absolute minimum for any text
+15 | The absolute minimum for any non-text
+
+```{r}
+#apca(RGB(255,255,255), RGB(234,116,57))
+```
+

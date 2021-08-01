@@ -1,20 +1,19 @@
 #' Get deltaE of two colors
 #'
+#' The calculation is performed in the CieLab color space.
 #' @param hexA Color A hex value
 #' @param hexB Color B hex value
 #'
 #' @examples deltaE("easternblue", "coral")
 #'
-deltaE <- function(hexA, hexB) {
-  labA = as(hex2RGB(hexA), "LAB")@coords[,1:3]
-  labB = as(hex2RGB(hexB), "LAB")@coords[,1:3]
-  print(labA[[1]])
-  l = ( (labA[[1]] - labB[[1]]) ) ^ 2
-  a = ( (labA[[2]] - labB[[2]]) ) ^ 2
-  b = ( (labA[[3]] - labB[[3]]) ) ^ 2
+deltaE76 <- function(hexA, hexB) {
+  labA = hexA$to("CieLab")
+  labB = hexB$to("CieLab")
+  l = ( (labA$L - labB$L) ) ^ 2
+  a = ( (labA$a - labB$a) ) ^ 2
+  b = ( (labA$b - labB$b) ) ^ 2
   return (sqrt(l + a + b))
 }
-
 
 #' Convert degree to radius
 #'
@@ -59,12 +58,15 @@ col2lab <- function(col, type = "hex") {
     rgb = hex2RGB(col)
   } else if (type == "RGB") {
     col = col / 255
-    rgb = RGB(col[1], col[2], col[3])
+    rgb = rgb(col[1], col[2], col[3])
   } else if (type == "rgb") {
-    rgb = RGB(col[1], col[2], col[3])
+    rgb = rgb(col[1], col[2], col[3])
   } else {
     #print(paste0("Type ", type, " not found"))
   }
+  lab <- rgb2XYZ(rgb)
+  lab <- XYZ2CieLab()
+  print(lab)
   lab <- Lab(
     L = as(rgb, "LAB")@coords[,1:3][[1]],
     a = as(rgb, "LAB")@coords[,1:3][[2]],
@@ -75,15 +77,15 @@ col2lab <- function(col, type = "hex") {
 
 #' Get deltaE of two colors
 #'
-#' @param col1 First color
-#' @param col2 Second color
-#' @param type Type of color ("hex", "rgb", "RGB", "lab")
+#' The calculation is performed in the CieLab color space.
+#' @param col1 First color [hex]
+#' @param col2 Second color [hex]
 #' @param k Correctur ("default", "screen", "textil")
 #'
 #' @See https://github.com/gfiumara/CIEDE2000
-deltaE2000 <- function(col1, col2, type = "hex", k = "default") {
-  lab1 = col2lab(col1, type)
-  lab2 = col2lab(col2, type)
+deltaE2000 <- function(col1, col2, k = "default") {
+  lab1 = col1$to("CieLab")
+  lab2 = col2$to("CieLab")
   if (k == "default") {
     k_L = 1.0
     k_C = 1.0
@@ -215,13 +217,20 @@ deltaE2000 <- function(col1, col2, type = "hex", k = "default") {
 #' * 30 The absolute minimum for any text
 #' * 15 The absolute minimum for any non-text
 #'
-#' @param bg Background color as rgb
-#' @param fg Foreground (Text) color as rgb (default white)
+#' The calculation is performed in the RGB color space
+#' @param bg Background color as color class
+#' @param fg Foreground (Text) color as color class (default white)
 #' @returns APCA contrast level
 #'
-#' @examples apca(c(255,255,255), c(234,116,57))
+#' @examples apca(RGB(255,255,255), RGB(234,116,57))
 #'
-apca <- function(bg, fg = c("255,255,255")) {
+apca <- function(bg, fg = RGB(255,255,255)) {
+  if(is.vector(bg))
+    bg = RGB(bg)
+  if(is.vector(fg))
+    fg = RGB(fg)
+  bg = bg$to("RGB")
+  fg = fg$to("RGB")
 
   trcExpon = 2.4
   Rco = 0.2126
@@ -246,12 +255,12 @@ apca <- function(bg, fg = c("255,255,255")) {
 
   loClip = 0.001
 
-  Ybg = (bg[1]/255)^trcExpon * Rco +
-    (bg[2]/255)^trcExpon * Gco +
-    (bg[3]/255)^trcExpon * Bco
-  Ytxt = (fg[1]/255)^trcExpon * Rco +
-    (fg[2]/255)^trcExpon * Gco +
-    (fg[3]/255)^trcExpon * Bco
+  Ybg = (bg$R/255)^trcExpon * Rco +
+    (bg$G/255)^trcExpon * Gco +
+    (bg$B/255)^trcExpon * Bco
+  Ytxt = (fg$R/255)^trcExpon * Rco +
+    (fg$G/255)^trcExpon * Gco +
+    (fg$B/255)^trcExpon * Bco
 
   if (Ytxt > blkThrs) {Ytxt + (blkThrs - Ytxt)^blkClmp}
   if (Ybg > blkThrs) {Ybg + (blkThrs - Ybg)^blkClmp}
@@ -282,6 +291,7 @@ apca <- function(bg, fg = c("255,255,255")) {
 
 #' Calculate the relative luminance of color
 #'
+#' The calculation is performed in the rgb  color space
 #' @param hex Color in hex rgb
 #' @examples luminance("#aabbcc")
 #'
